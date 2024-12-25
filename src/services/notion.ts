@@ -1,54 +1,43 @@
 import { Client } from "@notionhq/client";
-import { NotionEntry } from "../types";
 import { config } from "../config";
+import { NotionEntry } from "../types";
 
-const notion = new Client({ auth: config.NOTION_TOKEN });
+// Initialize the Notion client
+const notion = new Client({
+  auth: config.NOTION_TOKEN,
+});
 
 export async function createNotionEntry(entry: NotionEntry) {
   try {
     const response = await notion.pages.create({
       parent: { database_id: config.NOTION_DATABASE_ID },
       properties: {
-        地区: {
-          type: "multi_select",
-          multi_select: entry.地区?.map((tag) => ({ name: tag })) || [],
-        },
+        // ... existing code ...
         年龄: {
           type: "number",
-          number: entry.年龄,
+          number: entry.年龄 ?? null,
         },
         身高: {
           type: "number",
-          number: entry.身高,
+          number: entry.身高 ?? null,
         },
         体重: {
           type: "number",
-          number: entry.体重,
-        },
-        罩杯: {
-          type: "rich_text",
-          rich_text: [{ text: { content: entry.罩杯 || "" } }],
-        },
-        雪生工作: {
-          type: "rich_text",
-          rich_text: [{ text: { content: entry.雪生工作 || "" } }],
+          number: entry.体重 ?? null,
         },
         可陪伴天数: {
           type: "number",
-          number: entry.可陪伴天数,
+          number: entry.可陪伴天数 ?? null,
         },
         预期生活费用: {
           type: "number",
-          number: entry.预期生活费用,
+          number: entry.预期生活费用 ?? null,
         },
         介绍费: {
           type: "number",
-          number: entry.介绍费,
+          number: entry.介绍费 ?? null,
         },
-        content: {
-          type: "rich_text",
-          rich_text: [{ text: { content: entry.content } }],
-        },
+        // ... existing code ...
       },
     });
     return response;

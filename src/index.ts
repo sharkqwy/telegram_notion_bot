@@ -30,7 +30,7 @@ bot.command("status", async (ctx) => {
   try {
     await createNotionEntry({
       content: "Status check",
-      images: [],
+      attachments: [],
     });
     ctx.reply("✅ Connected to Notion successfully!");
   } catch (error) {
@@ -45,20 +45,20 @@ bot.command("status", async (ctx) => {
 bot.on("message", async (ctx) => {
   try {
     const message = ctx.message;
-    const images: string[] = [];
-    let text = "";
+    const attachments: string[] = [];
+    let content = "";
 
     if ("text" in message) {
-      text = message.text;
+      content = message.text;
     }
 
     if ("photo" in message) {
       const photo = message.photo[message.photo.length - 1];
       const fileLink = await ctx.telegram.getFileLink(photo.file_id);
-      images.push(fileLink.href);
+      attachments.push(fileLink.href);
     }
 
-    const entry = parseMessage(text, images);
+    const entry = parseMessage(content, attachments);
     await createNotionEntry(entry);
 
     ctx.reply("✅ Message successfully saved to Notion!");
