@@ -48,23 +48,47 @@ bot.on("message", async (ctx) => {
     const attachments: string[] = [];
     let content = "";
 
+    console.log("Received message:", JSON.stringify(message, null, 2));
+
+    // Handle text content
     if ("text" in message) {
       content = message.text;
     }
 
+    // Handle photos
     if ("photo" in message) {
-      const photo = message.photo[message.photo.length - 1];
-      const fileLink = await ctx.telegram.getFileLink(photo.file_id);
-      attachments.push(fileLink.href);
+      // Get the highest resolution photo
+      for (const photo of message.photo) {
+        try {
+          const fileLink = await ctx.telegram.getFileLink(photo.file_id);
+          attachments.push(fileLink.href);
+          console.log("Added photo:", fileLink.href);
+        } catch (photoError) {
+          console.error("Failed to get photo link:", photoError);
+        }
+      }
     }
 
-    const entry = parseMessage(content, attachments);
-    await createNotionEntry(entry);
+    // Handle caption if present
+    if ("caption" in message && message.caption) {
+      content = message.caption;
+    }
 
+    console.log("Parsed content:", content);
+    console.log("Parsed attachments:", attachments);
+
+    const entry = parseMessage(content, attachments);
+    console.log("Parsed entry:", JSON.stringify(entry, null, 2));
+
+    await createNotionEntry(entry);
     ctx.reply("✅ Message successfully saved to Notion!");
   } catch (error) {
-    ctx.reply("❌ Failed to save message to Notion. Please try again.");
     console.error("Message processing failed:", error);
+    if (error instanceof Error) {
+      ctx.reply(`❌ Failed to save message to Notion: ${error.message}`);
+    } else {
+      ctx.reply("❌ Failed to save message to Notion. Please try again.");
+    }
   }
 });
 
